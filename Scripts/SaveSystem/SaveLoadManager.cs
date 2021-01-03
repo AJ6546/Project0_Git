@@ -3,19 +3,26 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SaveLoadManager : MonoBehaviour
 {
     PlayerData data;
     DatabaseReference reference;
     PlayerStats playerStats;
-    public void SaveData(string userid, string usermail, int score)
+    int activeScene;
+    private void Start()
+    {
+        activeScene = SceneManager.GetActiveScene().buildIndex+1;
+    }
+    public void SaveData(string userid, string usermail)
     {
         reference = FirebaseDatabase.DefaultInstance.RootReference;
-        data = new PlayerData(userid, usermail, score);
+        data = new PlayerData(userid, usermail,activeScene,0);
         string jsonData = JsonUtility.ToJson(data);
         reference.Child("Player_"+ userid).SetRawJsonValueAsync(jsonData);
-        playerStats = new PlayerStats(userid, usermail, Convert.ToString(score));
+        playerStats = new PlayerStats(userid, usermail, 
+            activeScene, 0);
     }
     public void LoadData(string userid)
     {
@@ -30,9 +37,28 @@ public class SaveLoadManager : MonoBehaviour
                     DataSnapshot data = task.Result;
                     string playerData = data.Child("Player_" + userid).GetRawJsonValue();
                     PlayerData pd = JsonUtility.FromJson<PlayerData>(playerData);
-                    playerStats = new PlayerStats(userid, pd._email, Convert.ToString(pd._score));
+                    playerStats = new PlayerStats(userid, pd._email, 
+                        pd._sceneToLoad, pd._selectedPlayer);
                 }
             }
             );
+    }
+    public void UpdateSelectedPlayer(string userId,int selectedPlayer)
+    {
+        playerStats = new PlayerStats();
+        reference = FirebaseDatabase.DefaultInstance.RootReference;
+        IDictionary<string, object> update = new Dictionary<string, object>();
+        update["_selectedPlayer"] = selectedPlayer;
+        reference.Child("Player_" + userId).UpdateChildrenAsync(update);
+        playerStats.SelectedPlayer = selectedPlayer;
+    }
+    public void UpdateSceneToLoad(string userId, int sceneToLoad)
+    {
+        playerStats = new PlayerStats();
+        reference = FirebaseDatabase.DefaultInstance.RootReference;
+        IDictionary<string, object> update = new Dictionary<string, object>();
+        update["_sceneToLoad"] = sceneToLoad;
+        reference.Child("Player_" + userId).UpdateChildrenAsync(update);
+        playerStats.SceneToLoad = sceneToLoad;
     }
 }

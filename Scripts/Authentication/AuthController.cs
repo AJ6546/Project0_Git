@@ -1,19 +1,44 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Firebase.Auth;
+using System.Collections;
 
 public class AuthController : MonoBehaviour
 {
     [SerializeField] Text email, password, message;
     [SerializeField] FirebaseAuth auth;
     [SerializeField] SaveLoadManager slManager;
+    [SerializeField] Image screan;
+    bool userAuthenticated;
+    private void Awake()
+    {
+        userAuthenticated=FirebaseAuth.DefaultInstance.CurrentUser != null ? true : false;
+    }
+
+    
     private void Start()
     {
         auth = FirebaseAuth.DefaultInstance;
         slManager = FindObjectOfType<SaveLoadManager>();
-
-
+        StartCoroutine(LoadNextScene());
     }
+
+    IEnumerator LoadNextScene()
+    {
+        if (userAuthenticated)
+        {
+            screan.gameObject.SetActive(true);
+            message.text = "Logging in as " + FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+            yield return new WaitForSeconds(1f);
+            message.text = "Fetching data ";
+        }
+        else
+        {
+            screan.gameObject.SetActive(false);
+            message.text = "Please Log in";
+        }
+    }
+
     public void Login()
     {
         if (email.text == "" || password.text == "")
@@ -26,20 +51,17 @@ public class AuthController : MonoBehaviour
            {
                if (task.IsCanceled)
                {
-                   print("LogIn cancled");
                    message.text = "LogIn cancled";
                    return;
                }
                if (task.IsFaulted)
                {
-                   print(task.Exception);
                    message.text = task.Exception.Flatten().InnerExceptions[0].Message;
                    return;
                }
                if (task.IsCompleted)
                {
                    FirebaseUser user = task.Result;
-                   print("User Logged In Successfully");
                    message.text = "Logged in as "+ user.Email;
                }
            });
@@ -53,13 +75,11 @@ public class AuthController : MonoBehaviour
             message.text = "Pease enter a valid Email and Password !!";
             return;
         }
-        int score = Random.RandomRange(0, 25);
         auth.CreateUserWithEmailAndPasswordAsync(email.text, password.text).ContinueWith(
             task =>
             {
                 if (task.IsCanceled)
                 {
-                    print("Registeration cancled");
                     message.text = "Registeration cancled";
                     return;
                 }
@@ -72,8 +92,7 @@ public class AuthController : MonoBehaviour
                 if (task.IsCompleted)
                 {
                     FirebaseUser newUser = task.Result;
-                    print("User Created Successfully");
-                    slManager.SaveData(newUser.UserId,newUser.Email,score);
+                    slManager.SaveData(newUser.UserId,newUser.Email);
                     message.text = "User Created Successfully\nEmail: " + newUser.Email + "\nUserId: " + newUser.UserId;                   
                     return;
                 }
@@ -82,27 +101,26 @@ public class AuthController : MonoBehaviour
     }
     public void AnonymousLogin()
     {
+        int randomNo = Random.Range(0, 99999);
+        string guestId = "Guest" + randomNo.ToString() + "@Project0.com";
         auth.SignInAnonymouslyAsync().ContinueWith(
             task =>
             {
                 if (task.IsCanceled)
                 {
-                    print("LogIn cancled");
                     message.text = "LogIn cancled";
                     return;
                 }
                 if (task.IsFaulted)
                 {
-                    print(task.Exception);
                     message.text = task.Exception.Flatten().InnerExceptions[0].Message;
                     return;
                 }
                 if (task.IsCompleted)
                 {
                     FirebaseUser anonymousUser = task.Result;
-                    print("User Logged in anonymously");
-                    message.text = "User Logged in anonymously\nUserId: " + anonymousUser.UserId;
-                    //pd.SetPlayer(anonymousUser.UserId, "Ghost", 5);
+                    slManager.SaveData(anonymousUser.UserId, guestId);
+                    message.text = "User Logged in anonymously\nGuestID: " + guestId+"\nUserId: " + anonymousUser.UserId;
                     return;
                 }
             });
@@ -110,13 +128,19 @@ public class AuthController : MonoBehaviour
     public void Logout()
     { if(auth.CurrentUser!=null)
         {
-            print("User " + auth.CurrentUser.UserId + " Logged out");
             message.text = "User " + auth.CurrentUser.UserId + " Logged out";
             auth.SignOut();
         }
+        StartCoroutine(Quit());
     }
     private void Update()
     {
         message.SetAllDirty(); 
+    }
+    IEnumerator Quit()
+    {
+        message.text = "Exiting App";
+        yield return new WaitForSeconds(3f);
+        Application.Quit();
     }
 }

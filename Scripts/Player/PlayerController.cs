@@ -14,20 +14,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Camera camera;
     [SerializeField] float cameraAngle, cameraSpeed = 0.2f, rotOffset;
     [SerializeField] Vector3 cameraOffset;
-    //[SerializeField] Text txtMsg;
 
     void Start()
     {
         fixedJoystick = FindObjectOfType<FixedJoystick>();
-        fba = GetComponent<FixedButtonAssigner>();
+        fba = FindObjectOfType<FixedButtonAssigner>();
         jumpButton = fba.GetFixedButtons()[0];
         crouchButton = fba.GetFixedButtons()[1];
         logoutButton = fba.GetFixedButtons()[2];
         control = GetComponent<ThirdPersonUserControl>();
         touchField = FindObjectOfType<FixedTouchField>();
         camera = FindObjectOfType<Camera>();
-        Debug.Log("Player Score =" + PlayerStats.SCORE);
-        //txtMsg.text += PlayerStats.SCORE; // Please add a Textbox in Scene and set it up before uncommenting this 
     }
     void Update()
     {

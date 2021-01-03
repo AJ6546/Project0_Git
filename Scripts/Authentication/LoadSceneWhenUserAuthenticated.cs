@@ -6,11 +6,12 @@ using UnityEngine.SceneManagement;
 
 public class LoadSceneWhenUserAuthenticated : MonoBehaviour
 {
-    [SerializeField] int sceneToLoad;
     [SerializeField] SaveLoadManager slManager;
     [SerializeField] string userId = "";
+    PlayerStats playerStats;
     private void Start()
     {
+        playerStats = new PlayerStats();
         slManager = FindObjectOfType<SaveLoadManager>();
         FirebaseAuth.DefaultInstance.StateChanged += HandleAuthStateChanged;
         CheckUser();
@@ -39,6 +40,6 @@ public class LoadSceneWhenUserAuthenticated : MonoBehaviour
     {
         slManager.LoadData(userId);
         yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene(sceneToLoad);
+        SceneManager.LoadScene(Convert.ToInt32(playerStats.SceneToLoad));
     }
 }

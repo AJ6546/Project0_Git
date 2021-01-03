@@ -3,7 +3,7 @@
 public class FixedButtonAssigner : MonoBehaviour
 {
     [SerializeField] FixedButton[] fixedButtons;
-    [SerializeField] FixedButton[] fixedButtonsList = new FixedButton[2];
+    [SerializeField] FixedButton[] fixedButtonsList = new FixedButton[3];
     private void Awake()
     {
         fixedButtons = FindObjectsOfType<FixedButton>();
@@ -16,6 +16,10 @@ public class FixedButtonAssigner : MonoBehaviour
             if (f.name == "CrouchButton")
             {
                 fixedButtonsList[1] = f;
+            }
+            if(f.name=="LogoutButton")
+            {
+                fixedButtonsList[2] = f;
             }
         }
     }
