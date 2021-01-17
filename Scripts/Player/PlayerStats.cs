@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
-    static string USERID = "USERID", USERMAIL = "USERMAIL";
+    public static string USERID = "USERID", USERMAIL = "USERMAIL";
     static int SCENETOLOAD=0,SELECTEDPLAYER = 0;
     public PlayerStats(string useid, string usermail,int sceneToLoad, int selectedPlayer)
     {
@@ -13,6 +13,8 @@ public class PlayerStats : MonoBehaviour
         SELECTEDPLAYER = selectedPlayer;
     }
     public PlayerStats() { }
+
+
     public int SceneToLoad
     {
         get { return SCENETOLOAD; }
@@ -23,4 +25,5 @@ public class PlayerStats : MonoBehaviour
         get { return SELECTEDPLAYER; }
         set { SELECTEDPLAYER = value; }
     }
+    
 }

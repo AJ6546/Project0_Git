@@ -6,8 +6,8 @@ using System.Collections;
 public class AuthController : MonoBehaviour
 {
     [SerializeField] Text email, password, message;
-    [SerializeField] FirebaseAuth auth;
-    [SerializeField] SaveLoadManager slManager;
+    FirebaseAuth auth;
+    SaveLoadManager slManager;
     [SerializeField] Image screan;
     bool userAuthenticated;
     private void Awake()
@@ -19,7 +19,7 @@ public class AuthController : MonoBehaviour
     private void Start()
     {
         auth = FirebaseAuth.DefaultInstance;
-        slManager = FindObjectOfType<SaveLoadManager>();
+        slManager = GetComponent<SaveLoadManager>();
         StartCoroutine(LoadNextScene());
     }
 

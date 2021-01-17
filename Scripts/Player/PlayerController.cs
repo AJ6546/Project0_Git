@@ -1,8 +1,10 @@
 ﻿using Firebase.Auth;
+using Photon.Pun;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPun
 {
     [SerializeField] FixedJoystick fixedJoystick;
     [SerializeField] FixedButton jumpButton;
@@ -15,19 +17,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float cameraAngle, cameraSpeed = 0.2f, rotOffset;
     [SerializeField] Vector3 cameraOffset;
 
-    void Start()
+    void Awake()
     {
-        fixedJoystick = FindObjectOfType<FixedJoystick>();
+        if (SceneManager.GetActiveScene().buildIndex == 2)
+        { if (!photonView.IsMine) return; }
         fba = FindObjectOfType<FixedButtonAssigner>();
-        jumpButton = fba.GetFixedButtons()[0];
-        crouchButton = fba.GetFixedButtons()[1];
-        logoutButton = fba.GetFixedButtons()[2];
+        fixedJoystick = FindObjectOfType<FixedJoystick>();
         control = GetComponent<ThirdPersonUserControl>();
         touchField = FindObjectOfType<FixedTouchField>();
         camera = FindObjectOfType<Camera>();
     }
     void Update()
     {
+        if (SceneManager.GetActiveScene().buildIndex == 2)
+        { if (!photonView.IsMine) return; }
+        if(jumpButton==null || crouchButton==null || logoutButton==null)
+        {
+            jumpButton = fba.GetFixedButtons()[0];
+            crouchButton = fba.GetFixedButtons()[1];
+            logoutButton = fba.GetFixedButtons()[2];
+        }
         control.m_Jump = Input.GetKey("space") || jumpButton.Pressed;
         control.m_Crouch = Input.GetKey("c") || crouchButton.Pressed;
         control.hInput = Input.GetAxis("Horizontal") + fixedJoystick.Horizontal;

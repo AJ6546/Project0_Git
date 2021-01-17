@@ -1,7 +1,5 @@
 ﻿using Firebase.Auth;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,7 +11,7 @@ public class CharacterSelection : MonoBehaviour
     [SerializeField] Button selectButton;
     [SerializeField] Button reselectButton;
     [SerializeField] GameObject[] characterList;
-    [SerializeField] int childIndex, sceneToLoad;
+    [SerializeField]int childIndex, currentScene;
     string action = "Select",userId="";
     [SerializeField] SaveLoadManager slManager;
     PlayerStats playerStats;
@@ -22,7 +20,7 @@ public class CharacterSelection : MonoBehaviour
         userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         slManager = GetComponent<SaveLoadManager>();
         playerStats = new PlayerStats();
-
+        currentScene = SceneManager.GetActiveScene().buildIndex;
         characterList = new GameObject[transform.childCount];
         childIndex = playerStats.SelectedPlayer;
         reselectButton.gameObject.SetActive(false);
@@ -35,7 +33,7 @@ public class CharacterSelection : MonoBehaviour
             }
         }
         slManager.UpdateSceneToLoad(userId,
-            SceneManager.GetActiveScene().buildIndex);
+           currentScene);
         slManager.UpdateSelectedPlayer(userId, childIndex);
     }
     public void NextCharacter()
@@ -59,16 +57,20 @@ public class CharacterSelection : MonoBehaviour
         }
         characterList[childIndex].SetActive(true);
         slManager.UpdateSelectedPlayer(userId, childIndex);
+        
     }
     public void onSelectButtonClick()
     {
         if(action.Equals("Confirm"))
         {
-            SceneManager.LoadScene(sceneToLoad); }
+            SceneManager.LoadScene(currentScene+1); }
         reselectButton.gameObject.SetActive(true);
         nextButton.gameObject.SetActive(false);
         previousButton.gameObject.SetActive(false);
         action=selectButton.GetComponentInChildren<Text>().text = "Confirm";
+        ExitGames.Client.Photon.Hashtable playerSelectionProp = new ExitGames.Client.Photon.Hashtable
+                    { { Multiplayer.PLAYER_SELECTION_NUMBER, childIndex } };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerSelectionProp);
     }
     public void onReselectButtonClick()
     {
