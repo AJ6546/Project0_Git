@@ -1,21 +1,18 @@
 ﻿using Firebase.Auth;
 using Photon.Pun;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 
 public class PlayerController : MonoBehaviourPun
 {
     [SerializeField] FixedJoystick fixedJoystick;
-    [SerializeField] FixedButtonAssigner fba;
     [SerializeField] FixedButton jumpButton;
     [SerializeField] FixedButton crouchButton;
     [SerializeField] FixedButton logoutButton;
-    [SerializeField] FixedButton inventoryButton;
-    [SerializeField] FixedTouchField touchField;
-
+    [SerializeField] FixedButtonAssigner fba;
     [SerializeField] ThirdPersonUserControl control;
-
+    [SerializeField] FixedTouchField touchField;
     [SerializeField] Camera camera;
     [SerializeField] float cameraAngle, cameraSpeed = 0.2f, rotOffset;
     [SerializeField] Vector3 cameraOffset;
@@ -39,9 +36,11 @@ public class PlayerController : MonoBehaviourPun
             jumpButton = fba.GetFixedButtons()[0];
             crouchButton = fba.GetFixedButtons()[1];
             logoutButton = fba.GetFixedButtons()[2];
-            inventoryButton = fba.GetFixedButtons()[6];
         }
-
+        control.m_Jump = Input.GetKey("space") || jumpButton.Pressed;
+        control.m_Crouch = Input.GetKey("c") || crouchButton.Pressed;
+        control.hInput = Input.GetAxis("Horizontal") + fixedJoystick.Horizontal;
+        control.vInput = Input.GetAxis("Vertical") + fixedJoystick.Vertical;
         bool logout = Input.GetKey("escape") || logoutButton.Pressed;
         cameraAngle += touchField.TouchDist.x * cameraSpeed;
 
@@ -50,22 +49,9 @@ public class PlayerController : MonoBehaviourPun
             camera.transform.position
             , Vector3.up);
 
-        if (Input.GetKeyDown("i") || inventoryButton.Pressed)
-        {
-            fba.GetInventory().gameObject.SetActive(true);
-            //fba.GetGameUI().SetActive(false);
-        }
-
         if(logout)
         {
             FirebaseAuth.DefaultInstance.SignOut();
         }
-        //if (!health.isDead && !fighter.freeze)
-        //{
-            control.m_Jump = Input.GetKey("space") || jumpButton.Pressed;
-            control.m_Crouch = Input.GetKey("c") || crouchButton.Pressed;
-            control.hInput = Input.GetAxis("Horizontal") + fixedJoystick.Horizontal;
-            control.vInput = Input.GetAxis("Vertical") + fixedJoystick.Vertical;
-        //}
     }
 }
