@@ -9,7 +9,7 @@ public class SetDamageOverTime : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.GetComponent<DamageOverTime>().GetCharacterType()!=playerOrEnemy)
+        if(!other.CompareTag(playerOrEnemy))
         {
             other.GetComponent<DamageOverTime>().ApplyDamageOverTime(ticks, damage, inBetweenTime, type);
         }

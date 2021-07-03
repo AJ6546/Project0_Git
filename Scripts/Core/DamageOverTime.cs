@@ -9,17 +9,16 @@ public class DamageOverTime : MonoBehaviour
     Health health;
     [SerializeField] FixedButtonAssigner fba;
     [SerializeField] Image message;
-    [SerializeField] string characterType;
     
     void Start()
     {
         health = GetComponent<Health>();
-        if(characterType=="Player")
+        if(CompareTag("Player"))
         fba = GetComponent<FixedButtonAssigner>();
     }
     void Update()
     {
-        if(message==null && characterType=="Player")
+        if(message==null && CompareTag("Player"))
         {
             message = fba.GetMessageBox().GetComponent<Image>();
         }
@@ -38,7 +37,7 @@ public class DamageOverTime : MonoBehaviour
     }
     IEnumerator SetDamageOverTime(float damage, float inBetweenTime, string damageType)
     {
-        while(damageTickTimer.ContainsKey(damageType) && damageTickTimer[damageType] > 0)
+        while(damageTickTimer[damageType] > 0 && damageTickTimer.ContainsKey(damageType) )
         {
             damageTickTimer[damageType]--;
             health.TakeDamage(damage);
@@ -54,7 +53,7 @@ public class DamageOverTime : MonoBehaviour
     void SetDamge(string damageType)
     {
         string s = "";
-        if(characterType == "Player")
+        if(CompareTag("Player"))
         {
             switch(damageType)
             {
@@ -71,7 +70,7 @@ public class DamageOverTime : MonoBehaviour
     public void ResetDamage(string damageType)
     {
         string s = "";
-        if (characterType == "Player")
+        if (CompareTag("Player"))
         {
             switch (damageType)
             {
@@ -97,9 +96,5 @@ public class DamageOverTime : MonoBehaviour
         color.a = 0f;
         message.color = color;
         message.GetComponentInChildren<Text>().text = "";
-    }
-    public string GetCharacterType()
-    {
-        return characterType;
     }
 }
