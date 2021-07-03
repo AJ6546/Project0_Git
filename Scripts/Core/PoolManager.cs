@@ -22,7 +22,6 @@ public class PoolManager : MonoBehaviour
         pooldictionary = new Dictionary<string, Queue<GameObject>>();
         foreach(Pool pool in pools)
         {
-
             Queue<GameObject> objPool = new Queue<GameObject>();
             for(int i=0;i<pool.size;i++)
             {
@@ -34,13 +33,14 @@ public class PoolManager : MonoBehaviour
             pooldictionary.Add(pool.tag,objPool);
         }
     }
-    public void Spawn(string tag,Vector3 pos,Quaternion rot, string instantiator)
+    public void Spawn(string tag,Vector3 pos,Quaternion rot, string instantiator, Vector3 targetPos)
     {
         GameObject obj = pooldictionary[tag].Dequeue();
         obj.SetActive(true);
         obj.transform.position = pos;
         obj.transform.rotation = rot;
         obj.GetComponent<Projectiles>().SetInstantiator(instantiator);
+        obj.GetComponent<Projectiles>().SetAimLocation(targetPos);
         pooldictionary[tag].Enqueue(obj);
     }
     void ActivatePrefab(ref GameObject prefab)

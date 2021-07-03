@@ -1,30 +1,55 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Photon.Pun;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class ProjectileInstantiator : MonoBehaviour
+public class ProjectileInstantiator : MonoBehaviourPun
 {
-    Animator playerAnimator;
-    [SerializeField] string projectile1;
-    PoolManager poolManager;
-    [SerializeField] Transform instantiatorTransform;
+    public string projectile1;
+    public PoolManager poolManager;
+    public Transform instantiatorTransform;
+    public string playerId;
     void Start()
     {
-        playerAnimator = GetComponent<Animator>();
         poolManager = PoolManager.instance;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown("3"))
+        if (SceneManager.GetActiveScene().buildIndex == 2)
         {
-            playerAnimator.SetTrigger("Attack03");
+            playerId = photonView.Owner.NickName;
+        }
+        else
+        {
+            playerId = PlayerStats.USERID;
         }
     }
-    void Hit04()
+    public void SpawnProjectile(GameObject player)
     {
-        Vector3 spawnPos = instantiatorTransform.position;
-        poolManager.Spawn(projectile1, spawnPos, transform.rotation, PlayerStats.USERID);
+        if (SceneManager.GetActiveScene().buildIndex == 2)
+        {
+            if (player.GetComponent<PhotonView>().IsMine)
+            {
+                ProjectileInstantiator pi = player.GetComponent<ProjectileInstantiator>();
+                string projectile = pi.projectile1;
+                Vector3 spawnPos = pi.instantiatorTransform.position;
+                Quaternion rot = pi.transform.rotation;
+                Vector3 targetPos = pi.GetComponent<xFighter>().GetAimLocation();
+                string playerId = pi.playerId;
+                player.GetComponent<PhotonView>().RPC("Spawn", RpcTarget.AllBuffered
+                    , projectile, spawnPos, rot, playerId, targetPos);
+            }
+        }
+        else 
+        {
+            Vector3 spawnPos = instantiatorTransform.position;
+            Vector3 targetPos = GetComponent<Fighter>().GetAimLocation();
+            poolManager.Spawn(projectile1, spawnPos, transform.rotation,
+                PlayerStats.USERID, targetPos);
+        }
+    }
+    [PunRPC]
+    void Spawn(string projectile, Vector3 spawnPos, Quaternion rot,string playerId, Vector3 targetPos)
+    {
+        Debug.Log("I am: " + playerId+"\nspawnPos: "+ spawnPos+"\nrotation: "+rot+
+            "\nProjectile: "+projectile+"\nPoolManager: "+poolManager);
+        poolManager.Spawn(projectile1, spawnPos, rot, playerId,targetPos);
+
     }
 }

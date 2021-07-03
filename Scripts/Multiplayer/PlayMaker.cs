@@ -60,6 +60,7 @@ public class PlayMaker : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.CurrentRoom.IsOpen = false;
         myPhotonView.RPC("RPC_StartGame", RpcTarget.AllBufferedViaServer);
+        DeactivateAfterSeconds(lobbyUI, 0.2f);
     }
     public void OnBackButtonClicked()
     {
@@ -108,6 +109,7 @@ public class PlayMaker : MonoBehaviourPunCallbacks
         }
     }
     #endregion
+
     #region PrivateMethods
     void CreateAndJoinRoom()
     {
@@ -124,9 +126,9 @@ public class PlayMaker : MonoBehaviourPunCallbacks
             yield return null;
         if (loadPreviousScene) { SceneManager.LoadScene(1); }
     }
-    IEnumerator DeactivateAfterSeconds(GameObject gameObject, float _seconds)
+    IEnumerator DeactivateAfterSeconds(GameObject gameObject, float seconds)
     {
-        yield return new WaitForSeconds(_seconds);
+        yield return new WaitForSeconds(seconds);
         gameObject.SetActive(false);
     }
     void SetButtons()
@@ -164,9 +166,10 @@ public class PlayMaker : MonoBehaviourPunCallbacks
             if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(Multiplayer.PLAYER_SELECTION_NUMBER,
                 out playerSelectionNumber))
             {
-                spawnPos = new Vector3(Random.Range(-40, 400), 2, Random.Range(-40, 400));
+                spawnPos = new Vector3(Random.Range(-40, 40), 2, Random.Range(-40, 40));
                 PhotonNetwork.Instantiate(characters[(int)playerSelectionNumber].name, spawnPos, Quaternion.identity);
-                DeactivateAfterSeconds(lobbyUI, 0.2f);
+                Debug.Log("Here");
+                lobbyUI.SetActive(false);
             }
         }
     }

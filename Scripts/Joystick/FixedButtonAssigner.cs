@@ -7,12 +7,16 @@ public class FixedButtonAssigner : MonoBehaviourPun
     [SerializeField] FixedButton[] fixedButtons;
     [SerializeField] FixedButton[] fixedButtonsList = new FixedButton[7];
     [SerializeField] Message msg;
+    [SerializeField] Inventory inventory;
+    [SerializeField] GameObject gameUI;
     private void Awake()
     {
         if (SceneManager.GetActiveScene().buildIndex == 2)
         { if (!photonView.IsMine) return; }
         fixedButtons = FindObjectsOfType<FixedButton>();
         msg=FindObjectOfType<Message>();
+        gameUI = GameObject.FindGameObjectWithTag("GameUI");
+        inventory = FindObjectOfType<Inventory>();
             foreach (FixedButton f in fixedButtons)
             {
                 if (f.name == "JumpButton")
@@ -41,7 +45,7 @@ public class FixedButtonAssigner : MonoBehaviourPun
                 }
                 if (f.name == "InventoryButton")
                 {
-                    fixedButtonsList[5] = f;
+                    fixedButtonsList[6] = f;
                 }
         }
     }
@@ -52,5 +56,14 @@ public class FixedButtonAssigner : MonoBehaviourPun
     public Message GetMessageBox()
     {
         return msg;
+    }
+    public Inventory GetInventory()
+    {
+        return inventory;
+    }
+
+    public GameObject GetGameUI()
+    {
+        return gameUI;
     }
 }

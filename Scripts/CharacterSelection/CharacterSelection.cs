@@ -1,4 +1,4 @@
-﻿using Firebase.Auth;
+﻿
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,7 +17,7 @@ public class CharacterSelection : MonoBehaviour
     PlayerStats playerStats;
     void Start()
     {
-        userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        userId = "Test_"+Random.Range(0,10000);//FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         slManager = GetComponent<SaveLoadManager>();
         playerStats = new PlayerStats();
         currentScene = SceneManager.GetActiveScene().buildIndex;
@@ -45,6 +45,11 @@ public class CharacterSelection : MonoBehaviour
             childIndex = 0;
         }
         characterList[childIndex].SetActive(true);
+
+        //if (characterList[childIndex].GetComponent<xHealth>().isDead)
+        //{
+        //    characterList[childIndex].GetComponent<Animator>().SetTrigger("Death");
+        //}
         slManager.UpdateSelectedPlayer(userId, childIndex);
     }
     public void PreviousCharacter()
@@ -56,8 +61,12 @@ public class CharacterSelection : MonoBehaviour
             childIndex = characterList.Length - 1;
         }
         characterList[childIndex].SetActive(true);
+  
+        //if (characterList[childIndex].GetComponent<xHealth>().isDead)
+        //{
+        //    characterList[childIndex].GetComponent<Animator>().SetTrigger("Death");
+        //}
         slManager.UpdateSelectedPlayer(userId, childIndex);
-        
     }
     public void onSelectButtonClick()
     {
