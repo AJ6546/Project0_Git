@@ -11,5 +11,6 @@ public class Inventory : MonoBehaviour
     public void OnButtonPressed()
     {
         gameObject.SetActive(false);
+
     }
 }

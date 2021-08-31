@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 
@@ -196,7 +197,7 @@ using UnityEngine;
 				m_Rigidbody.velocity = v;
 			}
 		}
-
+        
 
 		void CheckGroundStatus()
 		{
@@ -219,5 +220,31 @@ using UnityEngine;
 				m_Animator.applyRootMotion = false;
 			}
 		}
-	}
+
+        public float GetBaseSpeed()
+        {
+            return m_MoveSpeedMultiplier;
+        }
+
+        public float SpeedModifier(float oldSpeedMod,float newSpeedMod, float lastingTime)
+        {
+            if(lastingTime>0)
+            {
+                m_MoveSpeedMultiplier += newSpeedMod;
+                StartCoroutine(SpeedBoost(lastingTime, newSpeedMod));
+            }
+            else
+            {
+                m_MoveSpeedMultiplier -= oldSpeedMod;
+                m_MoveSpeedMultiplier += newSpeedMod;
+            }
+            return m_MoveSpeedMultiplier;
+        }
+        IEnumerator SpeedBoost(float lastingTime, float mod)
+        {
+            yield return new WaitForSeconds(lastingTime);
+            this.m_MoveSpeedMultiplier -= mod;
+            GetComponent<CharacterStats>().UpdateSpeed(m_MoveSpeedMultiplier);
+        }
+}
 

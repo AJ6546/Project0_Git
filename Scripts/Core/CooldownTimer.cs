@@ -8,7 +8,7 @@ public class CooldownTimer : MonoBehaviourPun
     public Dictionary<string, int> coolDownTime = new Dictionary<string, int>
     { {"Attack01",5 },
         {"Attack02", 7 },
-        { "Attack03",10 }
+        { "Attack03",2 }
     };
     public Dictionary<string, int> nextAttackTime = new Dictionary<string, int>
     {  {"Attack01",0 },

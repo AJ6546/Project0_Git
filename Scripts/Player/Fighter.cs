@@ -6,28 +6,27 @@ using UnityEngine.UI;
 public class Fighter : MonoBehaviour
 {
     [SerializeField] GameObject target;
-    [SerializeField] float damage01, damage02, damage03, attackRange = 3f;
-    Animator playerAnimator;
+    
+    [SerializeField] float dmgFactor01=50, dmgFactor02=25, dmgFactor03=10, 
+        strength=100, attackRange = 3f;
+    public Animator playerAnimator;
     [SerializeField] FixedButtonAssigner fba;
     [SerializeField] FixedButton attack01Button, attack02Button, attack03Button;
     [SerializeField] CooldownTimer cd;
-    [SerializeField] int timer, a01, a02, a03;
+    [SerializeField] float strengthModifier=0,fleetingStrengthModifier=0;
     [SerializeField] GameObject attack01Fill, attack02Fill, attack03Fill;
-
+    [SerializeField] string playerId = "default"; // Need to Add
     void Start()
     {
         playerAnimator = GetComponent<Animator>();
         fba = GetComponent<FixedButtonAssigner>();
         cd = GetComponent<CooldownTimer>();
+        playerId = PlayerStats.USERID;// Need to Add
     }
 
 
     void Update()
     {
-        timer = (int)Time.time;
-        a01 = cd.nextAttackTime["Attack01"];
-        a02 = cd.nextAttackTime["Attack02"];
-        a03 = cd.nextAttackTime["Attack03"];
         if (attack01Button==null || attack01Button==null || attack01Button==null)
         {
             attack01Button = fba.GetFixedButtons()[3];
@@ -38,6 +37,9 @@ public class Fighter : MonoBehaviour
             attack03Fill = attack03Button.transform.Find("Fill").gameObject;
         }
         Refill();
+
+
+
         if (cd.nextAttackTime["Attack01"]
             <Time.time &&(Input.GetKeyDown("1") || attack01Button.Pressed))
         {
@@ -69,24 +71,63 @@ public class Fighter : MonoBehaviour
     void Hit01()
     {
         if (InAttackRange())
-        { target.GetComponent<Health>().TakeDamage(damage01); }
+        { target.GetComponent<Health>().TakeDamage((strength + strengthModifier + fleetingStrengthModifier) 
+            / dmgFactor01); }
     }
 
     void Hit02()
     {
         if (InAttackRange())
-        { target.GetComponent<Health>().TakeDamage(damage02); }
+        { target.GetComponent<Health>().TakeDamage((strength + strengthModifier + fleetingStrengthModifier) 
+            / dmgFactor02); }
     }
     void Hit03()
     {
         if (InAttackRange())
-        { target.GetComponent<Health>().TakeDamage(damage03); }
+        { target.GetComponent<Health>().TakeDamage((strength + strengthModifier + fleetingStrengthModifier) 
+            / dmgFactor03); }
     }
     void Hit04()
     {
         GetComponent<ProjectileInstantiator>().SpawnProjectile(gameObject);
     }
+    public float DamageModifier(float damageModifier,bool isPercent, float lastingTime)
+    {
+        if(isPercent)
+        {
+            float modifier = strength * damageModifier / 100;
+           
+            if (lastingTime > 0)
+            {
+                fleetingStrengthModifier += modifier;
+                StartCoroutine(PowerUp(lastingTime,modifier));
+            }
+            else
+            {
+                strengthModifier = modifier;
+            }
+        }
+        else
+        {
+            if (lastingTime > 0)
+            {
+                fleetingStrengthModifier += damageModifier;
+                StartCoroutine(PowerUp(lastingTime, damageModifier));
+            }
+            else
+            { strengthModifier = damageModifier; }     
+        }
+        return (strength + strengthModifier + fleetingStrengthModifier);
+    }
     #endregion
+
+    IEnumerator PowerUp(float lastingTime,float damageModifier)
+    {
+        yield return new WaitForSeconds(lastingTime);
+        fleetingStrengthModifier -= damageModifier;
+        GetComponent<CharacterStats>().UpdateStrength   (strength + strengthModifier + fleetingStrengthModifier);
+    }
+
     #region GetTargetPosition
     public Vector3 GetAimLocation()
     {
@@ -127,6 +168,17 @@ public class Fighter : MonoBehaviour
         else { attack03Fill.GetComponentInChildren<Text>().text = ""; }
     }
     #endregion
+    #region GetPlayerid 
+    public string GetPlayerID()// Need to Add
+    {
+        return playerId;
+    }
+    #endregion
+
+    public float GetBaseStrength()
+    {
+        return strength;
+    }
 }
 
 

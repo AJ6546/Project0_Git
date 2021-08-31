@@ -41,6 +41,7 @@ public class PoolManager : MonoBehaviour
         obj.transform.rotation = rot;
         obj.GetComponent<Projectiles>().SetInstantiator(instantiator);
         obj.GetComponent<Projectiles>().SetAimLocation(targetPos);
+        obj.GetComponent<Projectiles>().Move(true);
         pooldictionary[tag].Enqueue(obj);
     }
     void ActivatePrefab(ref GameObject prefab)

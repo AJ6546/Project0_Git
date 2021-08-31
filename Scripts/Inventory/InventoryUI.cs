@@ -12,7 +12,6 @@ public class InventoryUI : MonoBehaviour
         playerInventory.inventoryUpdated += Redraw;
     }
 
-    
     void Start()
     {
         Redraw();

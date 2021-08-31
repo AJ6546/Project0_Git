@@ -10,9 +10,11 @@ public class Item : ScriptableObject, ISerializationCallbackReceiver
     [SerializeField] [TextArea] string description = null;
     [SerializeField] Sprite icon = null;
     [SerializeField] bool stackable = false;
-
+    [SerializeField] Pickup pickup = null;
     static Dictionary<string, Item> itemLookupCache;
-
+    [SerializeField] float modifier, lastingTime;
+    public bool isPercent;
+    [SerializeField] ItemType itemType;
     public static Item GetFromID(string itemID)
     {
         if(itemLookupCache==null)
@@ -50,7 +52,13 @@ public class Item : ScriptableObject, ISerializationCallbackReceiver
     {
         return stackable;
     }
-
+    public Pickup SpawnPickup(Vector3 position,int number)
+    {
+        var pickup = Instantiate(this.pickup);
+        pickup.transform.position = position;
+        pickup.Setup(this,number);
+        return pickup;
+    }
     void ISerializationCallbackReceiver.OnBeforeSerialize()
     {
          if(string.IsNullOrWhiteSpace(itemID))
@@ -60,4 +68,12 @@ public class Item : ScriptableObject, ISerializationCallbackReceiver
     }
     void ISerializationCallbackReceiver.OnAfterDeserialize()
     { }
+    public virtual void Use()
+    {
+        FindObjectOfType<ItemManager>().Use(modifier,isPercent,itemType,lastingTime);
+    }
+}
+public enum ItemType
+{
+    Health, PowerUp, Protection, Speed, None
 }
