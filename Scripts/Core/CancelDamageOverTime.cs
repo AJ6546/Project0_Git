@@ -7,13 +7,28 @@ public class CancelDamageOverTime : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(CompareTag("Water") && other.GetComponent<DamageOverTime>().damageTickTimer.ContainsKey("Fire"))
+        if (other.GetComponent<DamageOverTime>())
         {
-            other.GetComponent<DamageOverTime>().ResetDamage("Fire");
+            DamageOverTime dot = other.GetComponent<DamageOverTime>();
+            switch (tag)
+            {
+                case "Water":
+                    if(CheckDamageType(dot,"Fire"))
+                    {
+                        dot.ResetDamage("Fire");
+                    }
+                    break;
+                case "Antidote":
+                    if(CheckDamageType(dot,"Poison"))
+                    {
+                        dot.ResetDamage("Poison");
+                    }
+                    break;
+            }
         }
-        else if (CompareTag("Antidote") && other.GetComponent<DamageOverTime>().damageTickTimer.ContainsKey("Poison"))
-        {
-            other.GetComponent<DamageOverTime>().ResetDamage("Poison");
-        }
+    }
+    bool CheckDamageType(DamageOverTime dot, string type)
+    {
+        return dot.damageTickTimer.ContainsKey(type);
     }
 }
