@@ -5,26 +5,36 @@ using System;
 
 public class CooldownTimer : MonoBehaviourPun
 {
-    public Dictionary<string, int> coolDownTime = new Dictionary<string, int>
-    { {"Attack01",5 },
-        {"Attack02", 7 },
-        { "Attack03",2 }
-    };
-    public Dictionary<string, int> nextAttackTime = new Dictionary<string, int>
-    {  {"Attack01",0 },
-        {"Attack02", 0 },
-        { "Attack03",0 }
-    };
+    [SerializeField] int[] attackTimers = new int[3];
+    public Dictionary<string, int> coolDownTime = new Dictionary<string, int>();
+    public Dictionary<string, int> nextAttackTime = new Dictionary<string, int>();
+
     private void Start()
     {
+        for(int i=0;i<attackTimers.Length;i++)
+        {
+            coolDownTime["Attack0" + (i + 1).ToString()] = attackTimers[i];
+            nextAttackTime["Attack0" + (i + 1).ToString()] = 0;
+        }
 
     }
 
-
-    private void Update()
-    { }
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

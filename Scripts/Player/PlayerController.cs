@@ -7,18 +7,16 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviourPun
 {
     [SerializeField] FixedJoystick fixedJoystick;
-    [SerializeField] FixedButtonAssigner fba;
-    [SerializeField] FixedButton jumpButton;
-    [SerializeField] FixedButton crouchButton;
-    [SerializeField] FixedButton logoutButton;
-    [SerializeField] FixedButton inventoryButton;
+    [SerializeField] UIAssigner uiAssigner;
+    [SerializeField] FixedButton jumpButton, crouchButton, logoutButton, inventoryButton,zoomButton;
+    
     [SerializeField] FixedTouchField touchField;
 
     [SerializeField] ThirdPersonUserControl control;
 
     [SerializeField] Camera camera;
     [SerializeField] Camera miniMap;
-    [SerializeField] Slider miniMapSlider;
+    [SerializeField] Slider miniMapSlider, zoomX,zoomY,zoomZ;
     [SerializeField] float cameraAngle, cameraSpeed = 0.2f, rotOffset;
     [SerializeField] Vector3 cameraOffset;
 
@@ -26,7 +24,7 @@ public class PlayerController : MonoBehaviourPun
     {
         if (SceneManager.GetActiveScene().buildIndex == 2)
         { if (!photonView.IsMine) return; }
-        fba = FindObjectOfType<FixedButtonAssigner>();
+        uiAssigner = FindObjectOfType<UIAssigner>();
         fixedJoystick = FindObjectOfType<FixedJoystick>();
         control = GetComponent<ThirdPersonUserControl>();
         touchField = FindObjectOfType<FixedTouchField>();
@@ -38,18 +36,28 @@ public class PlayerController : MonoBehaviourPun
     {
         if (SceneManager.GetActiveScene().buildIndex == 2)
         { if (!photonView.IsMine) return; }
-        if(jumpButton==null || crouchButton==null || logoutButton==null || miniMapSlider==null)
+        if(jumpButton==null || crouchButton==null || logoutButton==null || zoomButton==null||
+            miniMapSlider ==null || zoomX==null
+             || zoomY == null || zoomZ == null)
         {
-            jumpButton = fba.GetFixedButtons()[0];
-            crouchButton = fba.GetFixedButtons()[1];
-            logoutButton = fba.GetFixedButtons()[2];
-            inventoryButton = fba.GetFixedButtons()[6];
-            miniMapSlider = FindObjectOfType<Slider>();
+            jumpButton = uiAssigner.GetFixedButtons()[0];
+            crouchButton = uiAssigner.GetFixedButtons()[1];
+            logoutButton = uiAssigner.GetFixedButtons()[2];
+            inventoryButton = uiAssigner.GetFixedButtons()[6];
+            zoomButton = uiAssigner.GetFixedButtons()[8];
+            miniMapSlider = uiAssigner.GetSliders()[0];
+            zoomX = uiAssigner.GetSliders()[1]; zoomX.value = cameraOffset.x;
+            zoomY = uiAssigner.GetSliders()[2]; zoomY.value = cameraOffset.y;
+            zoomZ = uiAssigner.GetSliders()[3]; zoomZ.value = cameraOffset.z;
         }
 
         miniMap.transform.position = new Vector3(transform.position.x, miniMap.transform.position.y, 
             transform.position.z);
         miniMap.orthographicSize = miniMapSlider.value;
+        cameraOffset.x = zoomX.value;
+        cameraOffset.y = zoomY.value;
+        cameraOffset.z = zoomZ.value;
+
 
         bool logout = Input.GetKey("escape") || logoutButton.Pressed;
         cameraAngle += touchField.TouchDist.x * cameraSpeed;
@@ -61,20 +69,20 @@ public class PlayerController : MonoBehaviourPun
 
         if (Input.GetKeyDown("i") || inventoryButton.Pressed)
         {
-            fba.GetInventory().gameObject.SetActive(true);
-            //fba.GetGameUI().SetActive(false);
+            uiAssigner.GetInventoryUI().SetActive(true);
         }
 
-        if(logout)
+        if (Input.GetKeyDown("z") || zoomButton.Pressed)
+        {
+            uiAssigner.GetZoomUI().SetActive(true);
+        }
+        if (logout)
         {
             FirebaseAuth.DefaultInstance.SignOut();
         }
-        //if (!health.isDead && !fighter.freeze)
-        //{
             control.m_Jump = Input.GetKey("space") || jumpButton.Pressed;
             control.m_Crouch = Input.GetKey("c") || crouchButton.Pressed;
             control.hInput = Input.GetAxis("Horizontal") + fixedJoystick.Horizontal;
             control.vInput = Input.GetAxis("Vertical") + fixedJoystick.Vertical;
-        //}
     }
 }

@@ -12,7 +12,7 @@ public class ItemManager : MonoBehaviour
     string handItem = "HandItem";
     Fighter fighter;
     CharacterStats characterStats;
-    FixedButtonAssigner fba;
+    UIAssigner uiAssigner;
     [SerializeField] FixedButton unEquipButton;
     [SerializeField] Equipment defaultEquipment;
     void Start()
@@ -21,7 +21,7 @@ public class ItemManager : MonoBehaviour
         currentEquipment = new Equipment[numSlots];
         inventory = GetComponentInParent<PlayerInventory>();
         fighter = GetComponent<Fighter>();
-        fba = GetComponent<FixedButtonAssigner>();
+        uiAssigner = GetComponent<UIAssigner>();
         characterStats = GetComponent<CharacterStats>();
         Equip(defaultEquipment);
     }
@@ -108,7 +108,7 @@ public class ItemManager : MonoBehaviour
     {
         if(unEquipButton==null)
         {
-            unEquipButton = fba.GetFixedButtons()[7];
+            unEquipButton = uiAssigner.GetFixedButtons()[7];
         }
         if(Input.GetKeyDown("u")||unEquipButton.Pressed)
         {

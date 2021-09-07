@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,16 +9,18 @@ public class Fighter : MonoBehaviour
     [SerializeField] float dmgFactor01=50, dmgFactor02=25, dmgFactor03=10, 
         strength=100, attackRange = 3f;
     public Animator playerAnimator;
-    [SerializeField] FixedButtonAssigner fba;
+    [SerializeField] UIAssigner uiAssigner;
     [SerializeField] FixedButton attack01Button, attack02Button, attack03Button;
     [SerializeField] CooldownTimer cd;
     [SerializeField] float strengthModifier=0,fleetingStrengthModifier=0;
     [SerializeField] GameObject attack01Fill, attack02Fill, attack03Fill;
     [SerializeField] string playerId = "default"; // Need to Add
+
+    [SerializeField] float t1, t2, t3, timer;
     void Start()
     {
         playerAnimator = GetComponent<Animator>();
-        fba = GetComponent<FixedButtonAssigner>();
+        uiAssigner = GetComponent<UIAssigner>();
         cd = GetComponent<CooldownTimer>();
         playerId = PlayerStats.USERID;// Need to Add
     }
@@ -29,16 +30,14 @@ public class Fighter : MonoBehaviour
     {
         if (attack01Button==null || attack01Button==null || attack01Button==null)
         {
-            attack01Button = fba.GetFixedButtons()[3];
-            attack02Button = fba.GetFixedButtons()[4];
-            attack03Button = fba.GetFixedButtons()[5];
+            attack01Button = uiAssigner.GetFixedButtons()[3];
+            attack02Button = uiAssigner.GetFixedButtons()[4];
+            attack03Button = uiAssigner.GetFixedButtons()[5];
             attack01Fill = attack01Button.transform.Find("Fill").gameObject;
             attack02Fill = attack02Button.transform.Find("Fill").gameObject;
             attack03Fill = attack03Button.transform.Find("Fill").gameObject;
         }
         Refill();
-
-
 
         if (cd.nextAttackTime["Attack01"]
             <Time.time &&(Input.GetKeyDown("1") || attack01Button.Pressed))

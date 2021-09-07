@@ -40,6 +40,7 @@ public class ProjectileInstantiator : MonoBehaviourPun
         {
             Vector3 spawnPos = instantiatorTransform.position;
             Vector3 targetPos = GetComponent<Fighter>().GetAimLocation();
+            transform.LookAt(new Vector3(targetPos.x, transform.position.y, targetPos.z));
             poolManager.Spawn(projectile1, spawnPos, transform.rotation,
                 PlayerStats.USERID, targetPos);
         }
@@ -49,6 +50,7 @@ public class ProjectileInstantiator : MonoBehaviourPun
     {
         Debug.Log("I am: " + playerId+"\nspawnPos: "+ spawnPos+"\nrotation: "+rot+
             "\nProjectile: "+projectile+"\nPoolManager: "+poolManager);
+        transform.LookAt(new Vector3(targetPos.x, transform.position.y, targetPos.z));
         poolManager.Spawn(projectile1, spawnPos, rot, playerId,targetPos);
 
     }

@@ -7,7 +7,7 @@ public class DamageOverTime : MonoBehaviour
 {
     public Dictionary<string,int> damageTickTimer = new Dictionary<string, int>();
     Health health;
-    [SerializeField] FixedButtonAssigner fba;
+    [SerializeField] UIAssigner uiAssigner;
     [SerializeField] Image message;
     [SerializeField] string characterType;
     
@@ -15,13 +15,13 @@ public class DamageOverTime : MonoBehaviour
     {
         health = GetComponent<Health>();
         if(characterType=="Player")
-        fba = GetComponent<FixedButtonAssigner>();
+        uiAssigner = GetComponent<UIAssigner>();
     }
     void Update()
     {
         if(message==null && characterType=="Player")
         {
-            message = fba.GetMessageBox().GetComponent<Image>();
+            message = uiAssigner.GetMessageBox().GetComponent<Image>();
         }
     }
 
@@ -79,7 +79,7 @@ public class DamageOverTime : MonoBehaviour
                     s = "Fire put out";
                     break;
                 case "Poison":
-                    s = "You are cured from poison";
+                    s = "You are cured of poison";
                     break;
             }
         }
